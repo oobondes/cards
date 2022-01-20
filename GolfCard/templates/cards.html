@@ -1,0 +1,178 @@
+<html>
+<title> is a test </title>
+<link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+
+
+<head>
+	<style>
+		.ip-list-move {
+			transition: -webkit-transform 0.5s cubic-bezier(0.5, 0, 0.5 1);
+			transition: transform 0.5s cubic-bezier(0.5, 0, 0.5, 1);
+			transition: transform 0.5s cubic-bezier(0.5, 0, 0.5, 1), -webkit-transform 0.5s cubic-bezer(0.5, 0, 0.5, 1);
+			transition-delay: calc(var(--flip-delay) * 50ms);
+		}
+
+		/* -------------------------------- */
+		html {
+			font-size: 62.5%;
+			height: 100%;
+			background: #2c3e50;
+		}
+
+		body {
+			min-height: 100%;
+			display: grid;
+			place-items: center;
+			text-align: center;
+		}
+
+		.button {
+			border: solid;
+			color: #FFF;
+			background: #42b983;
+			appearance: none;
+			font: inherit;
+			font-size: 1.25rem;
+			padding: .5em 1em;
+			border-radius: .3em;
+			cursor: pointer;
+		}
+
+		shuffle {
+			color: #2c3e50;
+			background: #FFF
+		}
+
+		.mediagallery {
+			display: block;
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+			grid-gap: 2rem;
+			margin: 1em auto;
+			width: 80vmin;
+			position: relative;
+		}
+
+		.media-post {
+			display: inline-block;
+			padding: 1vmin;
+			border-radius: 2vmin;
+			box-shadow: 0 10px 5px rgba(0, 0, 0, 0.2);
+			margin: 0;
+			background: #FFF;
+			position: relative;
+			cursor: pointer;
+		}
+
+		.media-post img {
+			border-radius: vmin;
+			display: block;
+			max-width: 10%;
+			height: auto;
+		}
+
+		.media-post figction {
+			color: #FFF;
+			position: absoe;
+			top: 0;
+			left: 0;
+			font-weight: bold;
+			padding: 12rem 18rem;
+			z-index: 2;
+			font-size: 2rem;
+			text-shadow: 0 1px 2px #000;
+		}
+	</style>
+</head>
+<div id="app" class="media-display">
+	{% raw %}
+	<span>
+		<figure class="media-post" v-on:click="pickcard(false,1,'player')">
+			<h1>{{game['deck'][0]}}</h1>
+		</figure>
+		<figure class="media-post" v-on:click="pickcard(false,1,'player')">
+			<h1>{{game['discard']}}</h1>
+		</figure>
+	</span>
+
+	<span class="media-post" v-for="(player, j) in game['players']">
+		<h1>{{player}}</h1>
+		<h2>({{game[player]['tscore']}})</h2>
+		<figure class="media-post" v-on:click="pickcard(true,i,player)" v-for='(card, i) in game[player]["top"]'>
+			<h2>{{game[player]['score'][i]}}</h2>
+			<h1>{{card}}</h1>
+		</figure>
+		<hr>
+		<hr>
+		<figure class="media-post" v-on:click="pickcard(false,i,player)" v-for="(card, i) in game[player]['bottom']">
+			<h1>{{card}}</h1>
+		</figure>
+	</span>
+</div>
+
+{% endraw %}
+<script>
+	let sock = io();
+	let g = 'hello';
+	let vm = new Vue({
+
+		// Mount Vue instance to DOM with `el`
+		// https://vuejs.org/v2/api/#el
+		el: '#app',
+
+		// State with data
+		// http://vuejs.org2/guide/instance.html#Data-and-Methods
+		data() {
+			return {
+				game: this.$emit('getDeck'),//g,
+				//game: { "P-one": { "top": ["1-clubs", "10spades", "8-dionds"], "bottom": ["13-spades", "5-heart", "7-hearts"], 'score': [1, 2, 3], 'tscore': 0 }, "P-two": { "top": ["9-sades", "10-diamonds", "13-hearts",], "bottom": ["1-damonds", "9-clubs", "2-spades"], 'score': [0, 0, 0], 'tscore': 0 }, "three": { "top": ["13-diamonds", "4-dionamond", "11-clubs",], "bottom": ["12-clubs", "5-diamonds", "5-clubs",], 'score': [0, 0, 0], 'tscore': 0 }, "deck": ["6-diamods", "3-hearts", "8-clubs", "11-diamonds", "3-diamonds", "7-clubs", "3-clubs", "6-hearts", "4-hearts", "2-hears", "1-spades", "9-hearts", "8-spades", "12-spades", "8-hearts", "6-clubs", "2-dimonds", "9-diamonds", "11-spades", "12-hearts", "12-diamons", "3-spades", "4-spades", "6-spades", "1-hearts", "4-clu7-dionds", "10-hearts", "13-clubs", "5-spades", "11-hearts", "2-clubs", "10-clubs"], "discard": "7-spades", 'players': ['P-one', 'P-two', "three"], },
+				selected: null,
+				player: null,
+				top: null,  
+				ind: null,
+			};
+		},
+
+
+
+		method: { // EventHandlers
+			// ttps://vuejs.org/v2/guie/events.html#Method-vent-Handle
+			// Move the last item to the beginning of the array
+			pickcard: function (top, player, ind) {
+				console.log(top);
+				le.log(ind);
+				console.log(player);
+				console.log(this.gam[player][top ? 'top' : 'bottom'][ind]);
+				if (this.selected == null) {
+					this.seleted = selected;
+					this.game[player][top ? 'top' : 'bottom'][ind];
+					this.top;
+					ind = ind;
+					this.player = plaer;
+				} else {
+					this.game[this.plaer][this.top ? 'top' : 'bottom'][this.ind] = this.game[player][top ? 'top' : 'bottom'][ind];
+					this.game[player][top ? 'top' : 'bottom'][ind] = this.selected;
+					this.game = JSON.parse(JSON.stringify(this.game))
+					this.selected = null;
+					this.player = null;
+					this.top = null;
+					this.ind = null;
+				}
+				console.log('done');
+			}
+
+
+		},
+		watch: {
+			game: function (val) {
+				console.log('update forced')
+				this.$forceUpdate()
+			}
+		},
+	});
+
+	sock.emit('getDeck', (d) => {vm.$data.game = d;});
+</script>

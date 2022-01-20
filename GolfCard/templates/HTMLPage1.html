@@ -1,0 +1,59 @@
+﻿<html lang="en-US">
+
+<head>
+    <title>submission page</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf-8">
+    var socket = io();
+    socket.on('connect', function() {socket.emit('my event', {data: 'I\'m connected!'});});
+
+
+    //creates elements for cards
+    genTable(j) = function(j){
+        let element = document.getElementById("play");
+        for (k in j.hand) {
+            let hand = document.createElement('span')
+            hand.setAttribute('class',"playerhand")
+            for (x in j.hand[k]) {
+                let box = document.createElement('span')
+                box.setAttribute("ondrop", "drop(event)")
+                box.setAttribute("ondragover","allowDrop(event)")
+                let card = document.createElement('p');
+                card.setAttribute("draggable", "true")
+                card.setAttribute("ondragstart","drag(event)")
+                let innertext = document.createTextNode(k + j.hand[k][x]['card']);
+                card.appendChild(innertext);
+                box.appendChild(card)
+                hand.appendChild(box);
+            }
+            element.append(hand)
+        }
+    }
+        genTable({{ g }})
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            ev.target.appendChild(document.getElementById(data));
+        }
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/babel-polyfill/dist/polyfill.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.3.4/dist/vuetify.min.js"></script>
+
+    <body>
+        <h1>hello!</h1>
+        <div id="play"></div>
+    </body>
+
+</html>

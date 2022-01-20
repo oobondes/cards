@@ -1,0 +1,70 @@
+ <!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>GolfVue</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.3.4/dist/vuetify.min.css" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/babel-polyfill/dist/polyfill.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.3.4/dist/vuetify.min.js"></script>
+
+
+</head>
+<body>
+    {%raw%}
+    <div id="game">
+        <v-app>
+            <div v-for="player, pkey in game.players" :key="pkey">
+                <h1>{{player}}</h1>
+                <table>
+                    <v-row>
+                        <v-col>1</v-col>
+                        <v-col>2</v-col>
+                        <v-col>3</v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col v-for="card, ckey in game.hand[player].bottom">
+                            
+                                {{card.card.suit}}-{{card.card.card}}
+                            
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col v-for="card, ckey in game.hand[player].top">
+
+                            {{card.card.suit}}-{{card.card.card}}
+
+                        </v-col>
+                    </v-row>
+                </table>
+            </div>
+        </v-app>
+    </div>
+    {%endraw%}
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+    
+    <script>
+
+    var vm = new Vue({
+      el: '#game',
+      vuetify: new Vuetify(),
+
+      data: () => ({
+            game: {{ g | tojson()}}
+      }
+      ),
+    })
+
+    </script>
+    
+   
+</body>
+</html>
